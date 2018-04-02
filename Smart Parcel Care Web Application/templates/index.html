@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center" >
+  <h1>Welcome To Smart Parcel Care</h1>
+  <p class="lead">Enter your device ID to start tracking.</p>
+
+  {% from "includes/_formhelpers.html" import render_field %}
+<form method="POST" action="">
+  <div class="form-group">
+    {{render_field(form.deviceid, class_="form-control")}}
+  </div>
+  <p><input type="submit" class="btn btn-primary" value="Search"></p>
+</form>
+</div>
+{% endblock %}

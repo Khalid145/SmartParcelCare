@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Parcel Care</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"></link>
+
+
+</head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<style type="text/css">
+html { height: 100% }
+body { height: 100%; margin: 0; padding: 0 }
+#map_canvas{display:table;margin:0 auto;}
+</style>
+
+<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyDacaKvgAx-uptiuDDCTf0RMEeucHFS9KA"></script>
+<script type="text/javascript">
+function initialize()
+{
+  var devicedata="";
+  console.log(devicedata);
+  devicedata = JSON.parse({{ datajson|tojson }});
+  console.log(devicedata);
+
+
+
+  var latitude;
+  var longitude;
+
+
+
+  var greenIcon = {
+    url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png", // url
+    scaledSize: new google.maps.Size(50, 50), // scaled size
+    origin: new google.maps.Point(0,0), // origin
+    anchor: new google.maps.Point(0, 0) // anchor
+};
+
+  var redIcon = {
+    url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png", // url
+    scaledSize: new google.maps.Size(50, 50), // scaled size
+    origin: new google.maps.Point(0,0), // origin
+    anchor: new google.maps.Point(0, 0) // anchor
+};
+
+
+
+  for(var i =0;i<devicedata.length;i++){
+    latitude = devicedata[i].latitude;
+    longitude = devicedata[i].longitude;
+
+    console.log(latitude + " - " + longitude);
+  }
+
+var myOptions = {center: new google.maps.LatLng(latitude, longitude),
+ zoom: 15,
+ mapTypeId: google.maps.MapTypeId.ROADMAP
+};
+
+
+var map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+var infowindow = new google.maps.InfoWindow();
+
+    var marker = "";
+    var i = "";
+    var icon = "";
+    var warnings= 0;
+
+    var warningHTML;
+
+
+    for (i = 0; i < devicedata.length; i++) {
+
+      if( "impact" in devicedata[i] ||  "orientation" in devicedata[i] ) {
+               icon = redIcon;
+               warnings++
+             }else{
+                icon = greenIcon;
+             }
+             var noWarningsText = "<font color='green'>" + warnings + " warning. Warnings are shown as red markers</font>";
+             var warningsText = "<font color='red'>" + warnings + " warning. Warnings are shown as red markers</font>";
+
+
+             if (warnings <= 0){
+               warningHTML = noWarningsText;
+             }else{
+               warningHTML = warningsText;
+             }
+            document.getElementById('output').innerHTML = warningHTML;
+
+      marker = new google.maps.Marker({
+        position: new google.maps.LatLng(devicedata[i].latitude, devicedata[i].longitude),
+        icon: icon,
+        map: map,
+        label: devicedata[i].datano
+
+      });
+
+      google.maps.event.addListener(marker, 'click', (function(marker, i) {
+        return function() {
+          var content;
+
+          var failedContent = '<p>Time: ' + devicedata[i].timestamp + '</p>' +
+                        '<p>Temperature: ' +  devicedata[i].temperature + '°C' + '</p>' +
+                        '<p>Humidity: ' + devicedata[i].humidity + '</p>' +
+                        '<p>Impact: ' + devicedata[i].impact + '</p>' +
+                        '<p>Orientation: ' + devicedata[i].orientation + '</p>' +
+                        '<p>Humidity: ' + devicedata[i].humidity + '</p>';
+
+          var goodContent = '<p>Time: ' + devicedata[i].timestamp + '</p>' +
+                      '<p>Temperature: ' +  devicedata[i].temperature + '°C' + '</p>' +
+                        '<p>Humidity: ' + devicedata[i].humidity + '</p>';
+
+          if( "impact" in devicedata[i] ||  "orientation" in devicedata[i] ) {
+                   content = failedContent;
+                 }else{
+                   content = goodContent;
+                 }
+
+          infowindow.setContent(content);
+          infowindow.open(map, marker);
+        }
+      })(marker, i));
+    }
+}
+
+</script>
+<body onload="initialize()">
+{% include 'includes/_navbar.html' %}
+<div class="jumbotron text-center" style="padding: 20px;">
+  <h1>Parcel Information</h1>
+  <h6>Real-time tracking of your parcel every 5 seconds</h6>
+  <p id="output">warning. Warnings are shown are red markers.</p>
+</div>
+ <div id="map_canvas"style="width:100%; height:60%" ></div>
+</body>
+</html>
