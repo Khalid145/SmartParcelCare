@@ -15,7 +15,7 @@ datajson = []
 
 
 class searchDevice(Form):
-     deviceid = StringField('Device ID',[validators.Length(min=1, max=50)])
+     deviceid = StringField('Enter the Parcel ID: ',[validators.Length(min=1, max=50)])
 
 
 @app.route('/', methods=['GET','POST'])
@@ -69,7 +69,7 @@ def index():
         datajson = json.dumps(datalist)
 
         if not datalist:
-            flash('Invalid ID.','danger')
+            flash('Invalid Parcel ID. Please Try Again.','danger')
             return redirect(url_for('index'))
         else:
             return redirect(url_for('parcelInfo', datajson=datajson))
