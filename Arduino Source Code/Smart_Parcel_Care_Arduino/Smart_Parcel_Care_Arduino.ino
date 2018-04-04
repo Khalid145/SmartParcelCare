@@ -1,5 +1,8 @@
+#include <ArduinoJson.h>
+
 #include <SoftwareSerial.h>
 #include <SimpleDHT.h>
+
 ////LED START-----------------------------------------
 #define BLUE 9
 #define GREEN 8
@@ -63,22 +66,20 @@ float stringToFloat(String s){
  float latitude;
  float longitude;
 
- int datano = 0;
+ String deviceid = "device2";
+ int datano = 1;
 
+ 
+static const unsigned long REFRESH_INTERVAL = 1000; // ms
+  static unsigned long lastRefreshTime = 0;
  
 
 ///GPS END-----------------------------------------
 
 void loop() {
-
 digitalWrite(GREEN, HIGH);
-  
 ADXLLoop();
-
-
 PeriodicUpdate();
-
-
 if (zfinal < 281 && isSent == 'n'){
   isSent = 'y';
   OrientationUpdate();
@@ -90,8 +91,27 @@ if (zfinal < 281 && isSent == 'n'){
    ImpactUpdate();
   }
 delay(50);
-
 }
+
+
+
+
+void jsonifyPeriodicUpdates(){
+   StaticJsonBuffer<200> jsonBuffer;
+   JsonObject& root = jsonBuffer.createObject();
+
+   root["deviceid"] = deviceid;
+   root["datano"] = datano;
+   root["humidity"] = humidity;
+   root["latitude"] = latitude;
+   root["longitude"] = longitude;
+   root["temperature"] = temperature;
+
+char jsonChar[100];
+   root.printTo(jsonChar);
+   Serial.println(jsonChar);
+}
+
 
 void ImpactUpdate(){
    digitalWrite(BLUE, HIGH);
@@ -128,44 +148,20 @@ Serial.println(longitude,5);
 }
 
 void PeriodicUpdate(){
-  static const unsigned long REFRESH_INTERVAL = 5000; // ms
-  static unsigned long lastRefreshTime = 0;
-if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
+ if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
   {
-    digitalWrite(BLUE, HIGH);
   lastRefreshTime += REFRESH_INTERVAL;
+  digitalWrite(BLUE, HIGH);
   GPSLoop();
   DHT11Loop();
-  
-  Serial.print("{ 'deviceid':");
-  Serial.print("'device1'");
-  Serial.print(", 'datano':");
-  Serial.print("'");
-  Serial.print(datano);
-  Serial.print("'");
-  Serial.print(", 'humidity':");
-  Serial.print("'");
-  Serial.print(humidity);
-  Serial.print("%");
-  Serial.print("'");
-  Serial.print(", 'latitude':");
-  Serial.print("'");
-  Serial.print(latitude,5);
-  Serial.print("'");
-  Serial.print(", 'longitude':");
-  Serial.print("'");
-  Serial.print(longitude,5);
-  Serial.print("'");
-  Serial.print(", 'temperature':");
-  Serial.print("'");
-  Serial.print(temperature);
-  Serial.print(" C");
-  Serial.print("'");
-  Serial.print("}");
-  Serial.println("");
-  
-digitalWrite(BLUE, LOW);
+
+  //Serial.print("HELLO");
+  jsonifyPeriodicUpdates();
+
+ 
 datano = datano + 1;
+digitalWrite(BLUE, LOW);
+
   }
   
 }
