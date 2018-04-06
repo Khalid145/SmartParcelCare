@@ -8,10 +8,18 @@ import json
 import decimal
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
+from boto3.session import Session
 
 app = Flask(__name__)
 
 datajson = []
+
+aws_session_token = ''
+aws_access_key_id = 'AKIAIZYGKEGVYHCC375Q'
+aws_secret_access_key = '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'
+region =  'us-west-2'
+
+
 
 
 class searchDevice(Form):
@@ -24,7 +32,12 @@ def index():
     if request.method == 'POST' and form.validate():
         id = form.deviceid.data
 
-        dynamodb=boto3.resource('dynamodb')
+        dynamodb_session = Session(aws_access_key_id= aws_access_key_id,
+          aws_secret_access_key= aws_secret_access_key,
+          region_name= region)
+
+        dynamodb = dynamodb_session.resource('dynamodb')
+
         table=dynamodb.Table('Message')
         response = table.query(
             KeyConditionExpression=Key('deviceid').eq("device"+id)
@@ -84,5 +97,5 @@ def parcelInfo():
 
 if __name__ == '__main__':
     app.secret_key="secret123"
-    #app.run()
-    app.run(debug=True)
+
+    app.run(host='0.0.0.0')

@@ -3,6 +3,7 @@
 <head>
   <title>Smart Parcel Care</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"></link>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.css">
 
 
 </head>
@@ -12,7 +13,6 @@ html { height: 100% }
 body { height: 100%; margin: 0; padding: 0 }
 #map_canvas{display:table;margin:0 auto;}
 </style>
-
 <script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyDacaKvgAx-uptiuDDCTf0RMEeucHFS9KA"></script>
 <script type="text/javascript">
 function initialize()
@@ -22,12 +22,8 @@ function initialize()
   devicedata = JSON.parse({{ datajson|tojson }});
   console.log(devicedata);
 
-
-
   var latitude;
   var longitude;
-
-
 
   var greenIcon = {
     url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png", // url
@@ -123,8 +119,10 @@ var infowindow = new google.maps.InfoWindow();
       })(marker, i));
     }
 }
-
 </script>
+
+
+
 <body onload="initialize()">
 {% include 'includes/_navbar.html' %}
 <div class="jumbotron text-center" style="padding: 20px;">
@@ -132,6 +130,51 @@ var infowindow = new google.maps.InfoWindow();
   <h6>Real-time tracking of your parcel every 5 seconds</h6>
   <p id="output">warning. Warnings are shown are red markers.</p>
 </div>
- <div id="map_canvas"style="width:100%; height:60%" ></div>
+ <div id="map_canvas"style="width:100%; height:40%" ></div>
+<br></>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+ <div id="dvCSV" align="center" >
+ </div>
+
+
+
+
+
+
+
+
+ <script type="text/javascript">
+ var jsonData = JSON.parse({{ datajson|tojson }});
+function populateTable(object) {
+var obj = object;
+var table = $("<table />");
+table[0].border = "1";
+var columns = ["datano","timestamp", "temperature","humidity","longitude", , "latitude",  "impact", "orientation"]
+var columnCount = columns.length;
+
+
+var row = $(table[0].insertRow(-1));
+for (var i = 0; i < columnCount; i++) {
+ var headerCell = $("<th />");
+ headerCell.html([columns[i]]);
+ row.append(headerCell);
+
+ console.log("OOOOO: " +  headerCell);
+}
+for (var i = 0; i < obj.length; i++) {
+ row = $(table[0].insertRow(-1));
+ for (var j = 0; j < columnCount; j++) {
+     var cell = $("<td />");
+     cell.html(obj[i][columns[j]]);
+     row.append(cell);
+ }
+}
+var dvTable = $("#dvCSV");
+dvTable.html("");
+dvTable.append(table);
+}
+populateTable(jsonData)
+     </script>
+
 </body>
 </html>
