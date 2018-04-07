@@ -15,8 +15,8 @@ app = Flask(__name__)
 datajson = []
 
 aws_session_token = ''
-aws_access_key_id = 'AKIAIZYGKEGVYHCC375Q'
-aws_secret_access_key = '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'
+aws_access_key_id = ''
+aws_secret_access_key = ''
 region =  'us-west-2'
 
 
