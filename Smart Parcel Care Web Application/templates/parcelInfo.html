@@ -25,6 +25,8 @@ function initialize()
   var latitude;
   var longitude;
 
+
+
   var greenIcon = {
     url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png", // url
     scaledSize: new google.maps.Size(50, 50), // scaled size
@@ -73,8 +75,8 @@ var infowindow = new google.maps.InfoWindow();
              }else{
                 icon = greenIcon;
              }
-             var noWarningsText = "<font color='green'>" + warnings + " warning. Warnings are shown as red markers</font>";
-             var warningsText = "<font color='red'>" + warnings + " warning. Warnings are shown as red markers</font>";
+             var noWarningsText = "<font color='green'>" + warnings + " warning. Warnings are shown as RED </font>";
+             var warningsText = "<font color='red'>" + warnings + " warning. Warnings are shown as RED </font>";
 
 
              if (warnings <= 0){
@@ -123,6 +125,66 @@ var infowindow = new google.maps.InfoWindow();
 
 
 
+<script type="text/javascript">
+
+var TableIDvalue = "indextable";
+
+var TableLastSortedColumn = -1;
+function SortTable() {
+var sortColumn = parseInt(arguments[0]);
+var type = arguments.length > 1 ? arguments[1] : 'T';
+var dateformat = arguments.length > 2 ? arguments[2] : '';
+var table = document.getElementById(TableIDvalue);
+var tbody = table.getElementsByTagName("tbody")[0];
+var rows = tbody.getElementsByTagName("tr");
+var arrayOfRows = new Array();
+type = type.toUpperCase();
+dateformat = dateformat.toLowerCase();
+for(var i=0, len=rows.length; i<len; i++) {
+	arrayOfRows[i] = new Object;
+	arrayOfRows[i].oldIndex = i;
+	var celltext = rows[i].getElementsByTagName("td")[sortColumn].innerHTML.replace(/<[^>]*>/g,"");
+	if( type=='D' ) { arrayOfRows[i].value = GetDateSortingKey(dateformat,celltext); }
+	else {
+		var re = type=="N" ? /[^\.\-\+\d]/g : /[^a-zA-Z0-9]/g;
+		arrayOfRows[i].value = celltext.replace(re,"").substr(0,25).toLowerCase();
+		}
+	}
+if (sortColumn == TableLastSortedColumn) { arrayOfRows.reverse(); }
+else {
+	TableLastSortedColumn = sortColumn;
+	switch(type) {
+		case "N" : arrayOfRows.sort(CompareRowOfNumbers); break;
+		case "D" : arrayOfRows.sort(CompareRowOfNumbers); break;
+		default  : arrayOfRows.sort(CompareRowOfText);
+		}
+	}
+var newTableBody = document.createElement("tbody");
+for(var i=0, len=arrayOfRows.length; i<len; i++) {
+	newTableBody.appendChild(rows[arrayOfRows[i].oldIndex].cloneNode(true));
+	}
+table.replaceChild(newTableBody,tbody);
+}
+function CompareRowOfNumbers(a,b) {
+var aval = /\d/.test(a.value) ? parseFloat(a.value) : 0;
+var bval = /\d/.test(b.value) ? parseFloat(b.value) : 0;
+return( aval == bval ? 0 : (aval > bval ? 1 : -1) );
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <body onload="initialize()">
 {% include 'includes/_navbar.html' %}
 <div class="jumbotron text-center" style="padding: 20px;">
@@ -137,44 +199,61 @@ var infowindow = new google.maps.InfoWindow();
  </div>
 
 
-
-
-
-
-
+ <table id="indextable" class=table align="center">
+     <thead class="thead-light" align="center">
+               <th scope="col">Device ID</th>
+               <th>Date | Time</th>
+               <th><a href="javascript:SortTable(2,'N');">Data Point Number</th>
+               <th>Temperature</th>
+               <th>Humidity</th>
+               <th>Latitude</th>
+               <th>Longitude</th>
+               <th>Impact Measurement</th>
+               <th>Orientation Measurement</th>
+           </tr>
+     </thead>
+     <tbody id="tbody">
+     </tbody>
+ </table>
 
  <script type="text/javascript">
- var jsonData = JSON.parse({{ datajson|tojson }});
-function populateTable(object) {
-var obj = object;
-var table = $("<table />");
-table[0].border = "1";
-var columns = ["datano","timestamp", "temperature","humidity","longitude", , "latitude",  "impact", "orientation"]
-var columnCount = columns.length;
+ var obj = JSON.parse({{ datajson|tojson }});
+
+$.each(obj, function (index, item) {
+
+  var eachrow;
+  var bgcolor ="";
+  var greencolour = "#32CD32";
+  var redcolour = "#ff0000";
 
 
-var row = $(table[0].insertRow(-1));
-for (var i = 0; i < columnCount; i++) {
- var headerCell = $("<th />");
- headerCell.html([columns[i]]);
- row.append(headerCell);
+  console.log(item['impact']);
 
- console.log("OOOOO: " +  headerCell);
+if (item['impact'] == '-' || item['orientation'] == '-'){
+  bgcolor = greencolour;
+}else{
+  bgcolor = redcolour;
 }
-for (var i = 0; i < obj.length; i++) {
- row = $(table[0].insertRow(-1));
- for (var j = 0; j < columnCount; j++) {
-     var cell = $("<td />");
-     cell.html(obj[i][columns[j]]);
-     row.append(cell);
- }
-}
-var dvTable = $("#dvCSV");
-dvTable.html("");
-dvTable.append(table);
-}
-populateTable(jsonData)
-     </script>
 
+    eachrow = "<tr align='center' bgcolor= "+bgcolor+">"
+                 + "<td>" + item['deviceid'] + "</td>"
+                 + "<td>" + item['timestamp'] + "</td>"
+                 + "<td>" + item['datano'] + "</td>"
+                 + "<td>" + item['temperature'] + "</td>"
+                 + "<td>" + item['humidity'] + "</td>"
+                 + "<td>" + item['latitude'] + "</td>"
+                 + "<td>" + item['longitude'] + "</td>"
+                 + "<td>" + item['impact'] + "</td>"
+                 + "<td>" + item['orientation'] + "</td>"
+                 + "</tr>";
+     $('#tbody').append(eachrow);
+});
+ </script>
+
+
+
+
+
+<br></br>
 </body>
 </html>
