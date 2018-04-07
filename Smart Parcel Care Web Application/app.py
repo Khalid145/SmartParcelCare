@@ -3,7 +3,7 @@ from dateutil import parser
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from datetime import datetime
-import boto3
+#import boto3
 import json
 import decimal
 from boto3.dynamodb.conditions import Key, Attr
