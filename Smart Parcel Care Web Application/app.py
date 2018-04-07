@@ -3,7 +3,7 @@ from dateutil import parser
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from datetime import datetime
-#import boto3
+import boto3
 import json
 import decimal
 from boto3.dynamodb.conditions import Key, Attr
@@ -32,11 +32,12 @@ def index():
     if request.method == 'POST' and form.validate():
         id = form.deviceid.data
 
-        dynamodb_session = Session(aws_access_key_id= aws_access_key_id,
-          aws_secret_access_key= aws_secret_access_key,
-          region_name= region)
+        #dynamodb_session = Session(aws_access_key_id= aws_access_key_id,
+         # aws_secret_access_key= aws_secret_access_key,
+          #region_name= region)
 
-        dynamodb = dynamodb_session.resource('dynamodb')
+        #dynamodb = dynamodb_session.resource('dynamodb')
+        dynamodb=boto3.resource('dynamodb')
 
         table=dynamodb.Table('Message')
         response = table.query(
@@ -98,4 +99,4 @@ def parcelInfo():
 if __name__ == '__main__':
     app.secret_key="secret123"
 
-    app.run(host='0.0.0.0')
+    app.run()
