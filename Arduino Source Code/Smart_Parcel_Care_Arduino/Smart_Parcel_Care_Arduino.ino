@@ -34,14 +34,24 @@ int a2 = A1;
 int a3 = A2;
 ////ADXL335 END-----------------------------------------
 
+int greenledPin = 11;
+int redledPin = 12;
+int startbuttonpin = 10;
+int stopbuttonpin = 13;
+byte leds = 0;
+int run;
 
 
 void setup() {
   Serial.begin(9600);
+   run = 0; //starts stopped
 ////LED START-----------------------------------------
-  pinMode(GREEN, OUTPUT);
+  pinMode(greenledPin, OUTPUT);
+  pinMode(redledPin, OUTPUT);
+  pinMode(startbuttonpin, INPUT_PULLUP);
+  pinMode(stopbuttonpin, INPUT_PULLUP);   
+  digitalWrite(redledPin, HIGH);
   pinMode(BLUE, OUTPUT);
-  digitalWrite(GREEN, LOW);
   digitalWrite(BLUE, LOW);
 ///GPS START-----------------------------------------
   GPSModule.begin(9600);
@@ -62,110 +72,208 @@ float stringToFloat(String s){
 
  byte temperature = 0;
  byte humidity = 0;
-
  float latitude;
  float longitude;
+ String impact = "-";
+ String orientation = "-";
 
- String deviceid = "device2";
+ String deviceid = "device3";
  int datano = 1;
+ String buttonstate = "on";
 
  
-static const unsigned long REFRESH_INTERVAL = 1000; // ms
+static const unsigned long REFRESH_INTERVAL = 5000; // ms
   static unsigned long lastRefreshTime = 0;
  
 
 ///GPS END-----------------------------------------
 
-void loop() {
-digitalWrite(GREEN, HIGH);
-ADXLLoop();
-PeriodicUpdate();
-if (zfinal < 281 && isSent == 'n'){
-  isSent = 'y';
-  OrientationUpdate();
+
+void loop()
+{
+
+ x = analogRead(a1);     
+  y = analogRead(a2);     
+  z = analogRead(a3); 
+  xfinal = x, DEC;
+  yfinal = y, DEC;
+  zfinal = z, DEC;
+  
+  if(digitalRead(startbuttonpin) == LOW) {
+         run = 255;
+  }
+
+  if(digitalRead(stopbuttonpin) == LOW) {
+         run = 0;
+  }
+
+  if(run > 0)
+  { 
+    digitalWrite(redledPin, LOW);
+    digitalWrite(greenledPin, HIGH);
     
-  }else if (zfinal > 380 && isSent == 'y'){
+    if (zfinal < 340 && isSent == 'n'){
+    isSent = 'y';
+    orientation = zfinal;
+    orientationUpdate();
+    
+    }else if (zfinal > 380 && isSent == 'y'){
     isSent = 'n';
   }
-  if (yfinal < 130 || yfinal > 520 || xfinal < 110 || xfinal > 420){
-   ImpactUpdate();
+
+  if (yfinal < 130 || yfinal > 450){
+    impact = yfinal;
+    impactUpdate();
   }
-delay(50);
+
+  if (xfinal < 110 || xfinal > 550){
+    impact = xfinal;
+    impactUpdate();
+  }
+  delay(100); 
+  startUpdates();
+  }else{
+    digitalWrite(redledPin, HIGH);
+    digitalWrite(greenledPin, LOW);
+  }
 }
 
 
 
-
-void jsonifyPeriodicUpdates(){
-   StaticJsonBuffer<200> jsonBuffer;
-   JsonObject& root = jsonBuffer.createObject();
-
-   root["deviceid"] = deviceid;
-   root["datano"] = datano;
-   root["humidity"] = humidity;
-   root["latitude"] = latitude;
-   root["longitude"] = longitude;
-   root["temperature"] = temperature;
-
-char jsonChar[100];
-   root.printTo(jsonChar);
-   Serial.println(jsonChar);
+void startUpdates(){
+  ADXLLoop();
+PeriodicUpdate();
 }
 
 
-void ImpactUpdate(){
-   digitalWrite(BLUE, HIGH);
-    Serial.print(" Impact ALERT: ");
-    GPSLoop();
-     DHT11Loop();
-     
-    Serial.println(temperature);
-    Serial.println(humidity);
-  Serial.print(latitude,5);
-Serial.print(", ");
-Serial.println(longitude,5);
-    Serial.println(yfinal);
-    digitalWrite(BLUE, LOW);
-    datano = datano + 1;
-    Serial.println("____________________________");
-}
-
-void OrientationUpdate(){
-   
+void impactUpdate(){
+  digitalWrite(redledPin, HIGH);
+  GPSLoop();
+  DHT11Loop();
+  digitalWrite(redledPin, LOW);
   digitalWrite(BLUE, HIGH);
-    Serial.println("Orientation ALERT: SENT!");
-    GPSLoop();
-    DHT11Loop();
-    Serial.println(temperature);
-    Serial.println(humidity);
-  Serial.print(latitude,5);
-  Serial.print(", ");
-Serial.println(longitude,5);
-    Serial.println(zfinal);
-    digitalWrite(BLUE, LOW);
-    //datano = datano + 1;
-      Serial.println("____________________________");
+  createJson();
+  datano = datano + 1;
+  impact = "-";
+  digitalWrite(BLUE, LOW);
+}
+
+void orientationUpdate(){
+  digitalWrite(redledPin, HIGH);
+  GPSLoop();
+  DHT11Loop();
+  digitalWrite(redledPin, LOW);
+  digitalWrite(BLUE, HIGH);
+  createJson();
+  datano = datano + 1;
+  orientation = "-";
+  digitalWrite(BLUE, LOW);
 }
 
 void PeriodicUpdate(){
  if(millis() - lastRefreshTime >= REFRESH_INTERVAL)
   {
+  digitalWrite(redledPin, HIGH);
   lastRefreshTime += REFRESH_INTERVAL;
-  digitalWrite(BLUE, HIGH);
   GPSLoop();
   DHT11Loop();
-
-  //Serial.print("HELLO");
-  jsonifyPeriodicUpdates();
-
- 
-datano = datano + 1;
-digitalWrite(BLUE, LOW);
+  digitalWrite(redledPin, LOW);
+  digitalWrite(BLUE, HIGH);
+  createJson();
+   //StaticJsonBuffer<200> jsonBuffer;
+   //JsonObject& root = jsonBuffer.createObject();
+   //root["deviceid"] = deviceid;
+   //root["datano"] = datano;
+   //root["humidity"] = humidity;
+   //root["latitude"] = latitude;
+   //root["longitude"] = longitude;
+   //root["temperature"] = temperature;
+   //root["impact"] = impact;
+   //root["orientation"] = orientation;
+   //String jsonChar;
+   //root.printTo(jsonChar);
+   //Serial.println(jsonChar);
+   datano = datano + 1;
+   digitalWrite(BLUE, LOW);
 
   }
-  
 }
 
+
+void createJson(){
+  Serial.print('{');
+  Serial.print('"');
+  Serial.print("deviceid");
+  Serial.print('"');
+  Serial.print(':');
+  Serial.print('"');
+  Serial.print(deviceid);
+  Serial.print('"');
+  Serial.print(',');
+
+  Serial.print('"');
+  Serial.print("datano");
+  Serial.print('"');
+  Serial.print(':');
+  Serial.print('"');
+  Serial.print(datano);
+  Serial.print('"');
+  Serial.print(',');
+
+  Serial.print('"');
+  Serial.print("humidity");
+  Serial.print('"');
+  Serial.print(':');
+  Serial.print('"');
+  Serial.print(humidity);
+  Serial.print('"');
+  Serial.print(',');
+
+  Serial.print('"');
+  Serial.print("latitude");
+  Serial.print('"');
+  Serial.print(':');
+  Serial.print('"');
+  Serial.print(latitude);
+  Serial.print('"');
+  Serial.print(',');
+
+  Serial.print('"');
+  Serial.print("longitude");
+  Serial.print('"');
+  Serial.print(':');
+  Serial.print('"');
+  Serial.print(longitude);
+  Serial.print('"');
+  Serial.print(',');
+
+  Serial.print('"');
+  Serial.print("temperature");
+  Serial.print('"');
+  Serial.print(':');
+  Serial.print('"');
+  Serial.print(temperature);
+  Serial.print('"');
+  Serial.print(',');
+
+  Serial.print('"');
+  Serial.print("impact");
+  Serial.print('"');
+  Serial.print(':');
+  Serial.print('"');
+  Serial.print(impact);
+  Serial.print('"');
+  Serial.print(',');
+
+  Serial.print('"');
+  Serial.print("orientation");
+  Serial.print('"');
+  Serial.print(':');
+  Serial.print('"');
+  Serial.print(orientation);
+  Serial.print('"');
+  Serial.println('}');
+}
 
 void ADXLLoop(){
   x = analogRead(a1);     

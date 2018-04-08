@@ -9,6 +9,7 @@ import decimal
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 from boto3.session import Session
+import simplejson
 
 app = Flask(__name__)
 
@@ -52,6 +53,9 @@ def index():
             longitude = i['longitude']
             temperature = i['temperature']
 
+            print(longitude)
+
+
             try:
                 if 'humidity' in i:
                     humidity = i['humidity']
@@ -76,11 +80,15 @@ def index():
             except:
                 print ('EXCEPTION:')
 
+            #print(i)
 
 
             datalist.append(i)
 
+            #print(datalist)
+
         datajson = json.dumps(datalist)
+        #datajson = simplejson.dumps([datalist], default=json_encode_decimal
 
         if not datalist:
             flash('Invalid Parcel ID. Please Try Again.','danger')

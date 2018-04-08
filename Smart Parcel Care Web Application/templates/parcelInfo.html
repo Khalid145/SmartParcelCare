@@ -69,14 +69,14 @@ var infowindow = new google.maps.InfoWindow();
 
     for (i = 0; i < devicedata.length; i++) {
 
-      if( "impact" in devicedata[i] ||  "orientation" in devicedata[i] ) {
+      if( devicedata[i].impact=="-" ||  devicedata[i].orientation=="-" ) {
+               icon = greenIcon;
+             }else{
                icon = redIcon;
                warnings++
-             }else{
-                icon = greenIcon;
              }
-             var noWarningsText = "<font color='green'>" + warnings + " warning. Warnings are shown as RED </font>";
-             var warningsText = "<font color='red'>" + warnings + " warning. Warnings are shown as RED </font>";
+             var noWarningsText = "<font color='green'>" + warnings + " warnings.</font>";
+             var warningsText = "<font color='red'>" + warnings + " warnings. Warnings are shown as RED </font>";
 
 
              if (warnings <= 0){
@@ -198,7 +198,7 @@ return( aval == bval ? 0 : (aval > bval ? 1 : -1) );
  <div id="dvCSV" align="center" >
  </div>
 
-
+<div style="overflow-x:auto;">
  <table id="indextable" class=table align="center">
      <thead class="thead-light" align="center">
                <th scope="col">Device ID</th>
@@ -215,6 +215,7 @@ return( aval == bval ? 0 : (aval > bval ? 1 : -1) );
      <tbody id="tbody">
      </tbody>
  </table>
+</div>
 
  <script type="text/javascript">
  var obj = JSON.parse({{ datajson|tojson }});
