@@ -56,6 +56,8 @@ def index():
             print(longitude)
 
 
+
+
             try:
                 if 'humidity' in i:
                     humidity = i['humidity']
@@ -102,6 +104,7 @@ def index():
 def parcelInfo():
     datajson = request.args['datajson']
     return render_template('parcelInfo.html',datajson=datajson)
+
 
 
 if __name__ == '__main__':

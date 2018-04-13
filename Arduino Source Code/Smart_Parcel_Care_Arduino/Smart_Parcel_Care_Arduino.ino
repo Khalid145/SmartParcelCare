@@ -1,4 +1,5 @@
 #include <ArduinoJson.h>
+#include <pitches.h>
 
 #include <SoftwareSerial.h>
 #include <SimpleDHT.h>
@@ -40,6 +41,14 @@ int startbuttonpin = 10;
 int stopbuttonpin = 13;
 byte leds = 0;
 int run;
+
+int startMelody[] = {NOTE_C5, NOTE_C6};
+int stopMelody[] = {NOTE_C5, NOTE_C5};
+int dht11ErrorMelody[] = {NOTE_D5, NOTE_D5};
+int gpsErrorMelody[] = {NOTE_G6, NOTE_G6,NOTE_G6};
+int startMelodyDelay = 300;
+int stopMelodyDelay = 400;
+
 
 
 void setup() {
@@ -101,10 +110,23 @@ void loop()
   
   if(digitalRead(startbuttonpin) == LOW) {
          run = 255;
+         for (int thisNote = 0; thisNote < 2; thisNote++) {
+    // pin8 output the voice, every scale is 0.5 sencond
+    tone(8, startMelody[thisNote], 300);
+    // Output the voice after several minutes
+    delay(startMelodyDelay);
+  }
+  
   }
 
   if(digitalRead(stopbuttonpin) == LOW) {
          run = 0;
+          for (int thisNote = 0; thisNote < 2; thisNote++) {
+    // pin8 output the voice, every scale is 0.5 sencond
+    tone(8, stopMelody[thisNote], 300);
+    // Output the voice after several minutes
+    delay(stopMelodyDelay);
+  }
   }
 
   if(run > 0)
@@ -148,8 +170,8 @@ PeriodicUpdate();
 
 void impactUpdate(){
   digitalWrite(redledPin, HIGH);
-  GPSLoop();
   DHT11Loop();
+  GPSLoop();
   digitalWrite(redledPin, LOW);
   digitalWrite(BLUE, HIGH);
   createJson();
@@ -160,8 +182,8 @@ void impactUpdate(){
 
 void orientationUpdate(){
   digitalWrite(redledPin, HIGH);
-  GPSLoop();
   DHT11Loop();
+  GPSLoop();
   digitalWrite(redledPin, LOW);
   digitalWrite(BLUE, HIGH);
   createJson();
@@ -175,8 +197,8 @@ void PeriodicUpdate(){
   {
   digitalWrite(redledPin, HIGH);
   lastRefreshTime += REFRESH_INTERVAL;
-  GPSLoop();
   DHT11Loop();
+  GPSLoop();
   digitalWrite(redledPin, LOW);
   digitalWrite(BLUE, HIGH);
   createJson();
@@ -289,7 +311,12 @@ void DHT11Loop(){
   delay(500);
   byte data[40] = {0};
   if (dht11.read(pinDHT11, &temperature, &humidity, data)) {
-    Serial.print("Read DHT11 failed");
+     for (int thisNote = 0; thisNote < 2; thisNote++) {
+    // pin8 output the voice, every scale is 0.5 sencond
+    tone(8, dht11ErrorMelody[thisNote], 100);
+    // Output the voice after several minutes
+    delay(400);
+     }
     return;
   }
 }
@@ -322,13 +349,19 @@ void GPSLoop(){
   }
   else {
     failedUpdates++;
+    for (int thisNote = 0; thisNote < 3; thisNote++) {
+    // pin8 output the voice, every scale is 0.5 sencond
+    tone(8, gpsErrorMelody[thisNote], 100);
+    // Output the voice after several minutes
+    delay(400);
+     }
+    
   }
   stringplace = 0;
   pos = 0;
   
   
 }
-
 
 
 

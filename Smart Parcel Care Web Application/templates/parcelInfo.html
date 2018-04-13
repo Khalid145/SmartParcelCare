@@ -32,14 +32,14 @@ function initialize()
     scaledSize: new google.maps.Size(50, 50), // scaled size
     origin: new google.maps.Point(0,0), // origin
     anchor: new google.maps.Point(0, 0) // anchor
-};
+  };
 
   var redIcon = {
     url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png", // url
     scaledSize: new google.maps.Size(50, 50), // scaled size
     origin: new google.maps.Point(0,0), // origin
     anchor: new google.maps.Point(0, 0) // anchor
-};
+  };
 
 
 
@@ -50,76 +50,76 @@ function initialize()
     console.log(latitude + " - " + longitude);
   }
 
-var myOptions = {center: new google.maps.LatLng(latitude, longitude),
- zoom: 15,
- mapTypeId: google.maps.MapTypeId.ROADMAP
-};
+  var myOptions = {center: new google.maps.LatLng(latitude, longitude),
+    zoom: 15,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
 
 
-var map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
-var infowindow = new google.maps.InfoWindow();
+  var map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+  var infowindow = new google.maps.InfoWindow();
 
-    var marker = "";
-    var i = "";
-    var icon = "";
-    var warnings= 0;
+  var marker = "";
+  var i = "";
+  var icon = "";
+  var warnings= 0;
 
-    var warningHTML;
-
-
-    for (i = 0; i < devicedata.length; i++) {
-
-      if( devicedata[i].impact=="-" ||  devicedata[i].orientation=="-" ) {
-               icon = greenIcon;
-             }else{
-               icon = redIcon;
-               warnings++
-             }
-             var noWarningsText = "<font color='green'>" + warnings + " warnings.</font>";
-             var warningsText = "<font color='red'>" + warnings + " warnings. Warnings are shown as RED </font>";
+  var warningHTML;
 
 
-             if (warnings <= 0){
-               warningHTML = noWarningsText;
-             }else{
-               warningHTML = warningsText;
-             }
-            document.getElementById('output').innerHTML = warningHTML;
+  for (i = 0; i < devicedata.length; i++) {
 
-      marker = new google.maps.Marker({
-        position: new google.maps.LatLng(devicedata[i].latitude, devicedata[i].longitude),
-        icon: icon,
-        map: map,
-        label: devicedata[i].datano
-
-      });
-
-      google.maps.event.addListener(marker, 'click', (function(marker, i) {
-        return function() {
-          var content;
-
-          var failedContent = '<p>Time: ' + devicedata[i].timestamp + '</p>' +
-                        '<p>Temperature: ' +  devicedata[i].temperature + '°C' + '</p>' +
-                        '<p>Humidity: ' + devicedata[i].humidity + '</p>' +
-                        '<p>Impact: ' + devicedata[i].impact + '</p>' +
-                        '<p>Orientation: ' + devicedata[i].orientation + '</p>' +
-                        '<p>Humidity: ' + devicedata[i].humidity + '</p>';
-
-          var goodContent = '<p>Time: ' + devicedata[i].timestamp + '</p>' +
-                      '<p>Temperature: ' +  devicedata[i].temperature + '°C' + '</p>' +
-                        '<p>Humidity: ' + devicedata[i].humidity + '</p>';
-
-          if( "impact" in devicedata[i] ||  "orientation" in devicedata[i] ) {
-                   content = failedContent;
-                 }else{
-                   content = goodContent;
-                 }
-
-          infowindow.setContent(content);
-          infowindow.open(map, marker);
-        }
-      })(marker, i));
+    if(parseFloat(devicedata[i].orientation).toString() === devicedata[i].orientation || parseFloat(devicedata[i].impact).toString() === devicedata[i].impact) {
+      icon = redIcon;
+      warnings++
+    }else{
+      icon = greenIcon;
     }
+    var noWarningsText = "<font color='green'>" + warnings + " warnings.</font>";
+    var warningsText = "<font color='red'>" + warnings + " warnings. Warnings are shown as RED </font>";
+
+
+    if (warnings <= 0){
+      warningHTML = noWarningsText;
+    }else{
+      warningHTML = warningsText;
+    }
+    document.getElementById('output').innerHTML = warningHTML;
+
+    marker = new google.maps.Marker({
+      position: new google.maps.LatLng(devicedata[i].latitude, devicedata[i].longitude),
+      icon: icon,
+      map: map,
+      label: devicedata[i].datano
+
+    });
+
+    google.maps.event.addListener(marker, 'click', (function(marker, i) {
+      return function() {
+        var content;
+
+        var failedContent = '<p>Time: ' + devicedata[i].timestamp + '</p>' +
+        '<p>Temperature: ' +  devicedata[i].temperature + '°C' + '</p>' +
+        '<p>Humidity: ' + devicedata[i].humidity + '</p>' +
+        '<p>Impact: ' + devicedata[i].impact + '</p>' +
+        '<p>Orientation: ' + devicedata[i].orientation + '</p>' +
+        '<p>Humidity: ' + devicedata[i].humidity + '</p>';
+
+        var goodContent = '<p>Time: ' + devicedata[i].timestamp + '</p>' +
+        '<p>Temperature: ' +  devicedata[i].temperature + '°C' + '</p>' +
+        '<p>Humidity: ' + devicedata[i].humidity + '</p>';
+
+        if( "impact" in devicedata[i] ||  "orientation" in devicedata[i] ) {
+          content = failedContent;
+        }else{
+          content = goodContent;
+        }
+
+        infowindow.setContent(content);
+        infowindow.open(map, marker);
+      }
+    })(marker, i));
+  }
 }
 </script>
 
@@ -131,44 +131,44 @@ var TableIDvalue = "indextable";
 
 var TableLastSortedColumn = -1;
 function SortTable() {
-var sortColumn = parseInt(arguments[0]);
-var type = arguments.length > 1 ? arguments[1] : 'T';
-var dateformat = arguments.length > 2 ? arguments[2] : '';
-var table = document.getElementById(TableIDvalue);
-var tbody = table.getElementsByTagName("tbody")[0];
-var rows = tbody.getElementsByTagName("tr");
-var arrayOfRows = new Array();
-type = type.toUpperCase();
-dateformat = dateformat.toLowerCase();
-for(var i=0, len=rows.length; i<len; i++) {
-	arrayOfRows[i] = new Object;
-	arrayOfRows[i].oldIndex = i;
-	var celltext = rows[i].getElementsByTagName("td")[sortColumn].innerHTML.replace(/<[^>]*>/g,"");
-	if( type=='D' ) { arrayOfRows[i].value = GetDateSortingKey(dateformat,celltext); }
-	else {
-		var re = type=="N" ? /[^\.\-\+\d]/g : /[^a-zA-Z0-9]/g;
-		arrayOfRows[i].value = celltext.replace(re,"").substr(0,25).toLowerCase();
-		}
-	}
-if (sortColumn == TableLastSortedColumn) { arrayOfRows.reverse(); }
-else {
-	TableLastSortedColumn = sortColumn;
-	switch(type) {
-		case "N" : arrayOfRows.sort(CompareRowOfNumbers); break;
-		case "D" : arrayOfRows.sort(CompareRowOfNumbers); break;
-		default  : arrayOfRows.sort(CompareRowOfText);
-		}
-	}
-var newTableBody = document.createElement("tbody");
-for(var i=0, len=arrayOfRows.length; i<len; i++) {
-	newTableBody.appendChild(rows[arrayOfRows[i].oldIndex].cloneNode(true));
-	}
-table.replaceChild(newTableBody,tbody);
+  var sortColumn = parseInt(arguments[0]);
+  var type = arguments.length > 1 ? arguments[1] : 'T';
+  var dateformat = arguments.length > 2 ? arguments[2] : '';
+  var table = document.getElementById(TableIDvalue);
+  var tbody = table.getElementsByTagName("tbody")[0];
+  var rows = tbody.getElementsByTagName("tr");
+  var arrayOfRows = new Array();
+  type = type.toUpperCase();
+  dateformat = dateformat.toLowerCase();
+  for(var i=0, len=rows.length; i<len; i++) {
+    arrayOfRows[i] = new Object;
+    arrayOfRows[i].oldIndex = i;
+    var celltext = rows[i].getElementsByTagName("td")[sortColumn].innerHTML.replace(/<[^>]*>/g,"");
+    if( type=='D' ) { arrayOfRows[i].value = GetDateSortingKey(dateformat,celltext); }
+    else {
+      var re = type=="N" ? /[^\.\-\+\d]/g : /[^a-zA-Z0-9]/g;
+      arrayOfRows[i].value = celltext.replace(re,"").substr(0,25).toLowerCase();
+    }
+  }
+  if (sortColumn == TableLastSortedColumn) { arrayOfRows.reverse(); }
+  else {
+    TableLastSortedColumn = sortColumn;
+    switch(type) {
+      case "N" : arrayOfRows.sort(CompareRowOfNumbers); break;
+      case "D" : arrayOfRows.sort(CompareRowOfNumbers); break;
+      default  : arrayOfRows.sort(CompareRowOfText);
+    }
+  }
+  var newTableBody = document.createElement("tbody");
+  for(var i=0, len=arrayOfRows.length; i<len; i++) {
+    newTableBody.appendChild(rows[arrayOfRows[i].oldIndex].cloneNode(true));
+  }
+  table.replaceChild(newTableBody,tbody);
 }
 function CompareRowOfNumbers(a,b) {
-var aval = /\d/.test(a.value) ? parseFloat(a.value) : 0;
-var bval = /\d/.test(b.value) ? parseFloat(b.value) : 0;
-return( aval == bval ? 0 : (aval > bval ? 1 : -1) );
+  var aval = /\d/.test(a.value) ? parseFloat(a.value) : 0;
+  var bval = /\d/.test(b.value) ? parseFloat(b.value) : 0;
+  return( aval == bval ? 0 : (aval > bval ? 1 : -1) );
 }
 </script>
 
@@ -186,75 +186,91 @@ return( aval == bval ? 0 : (aval > bval ? 1 : -1) );
 
 
 <body onload="initialize()">
-{% include 'includes/_navbar.html' %}
-<div class="jumbotron text-center" style="padding: 20px;">
-  <h1>Parcel Information</h1>
-  <h6>Real-time tracking of your parcel every 5 seconds</h6>
-  <p id="output">warning. Warnings are shown are red markers.</p>
-</div>
- <div id="map_canvas"style="width:100%; height:40%" ></div>
-<br></>
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
- <div id="dvCSV" align="center" >
- </div>
-
-<div style="overflow-x:auto;">
- <table id="indextable" class=table align="center">
-     <thead class="thead-light" align="center">
-               <th scope="col">Device ID</th>
-               <th>Date | Time</th>
-               <th><a href="javascript:SortTable(2,'N');">Data Point Number</th>
-               <th>Temperature</th>
-               <th>Humidity</th>
-               <th>Latitude</th>
-               <th>Longitude</th>
-               <th>Impact Measurement</th>
-               <th>Orientation Measurement</th>
-           </tr>
-     </thead>
-     <tbody id="tbody">
-     </tbody>
- </table>
-</div>
-
- <script type="text/javascript">
- var obj = JSON.parse({{ datajson|tojson }});
-
-$.each(obj, function (index, item) {
-
-  var eachrow;
-  var bgcolor ="";
-  var greencolour = "#32CD32";
-  var redcolour = "#ff0000";
+  {% include 'includes/_navbar.html' %}
+  <div class="jumbotron text-center" style="padding: 20px;">
+    <h1>Parcel Information</h1>
+    <h6>Real-time tracking of your parcel every 5 seconds</h6>
+    <p id="output">warning. Warnings are shown are red markers.</p>
+  </div>
+  <div id="map_canvas"style="width:100%; height:40%" ></div>
+  <br></>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <div id="dvCSV" align="center" >
+  </div>
 
 
-  console.log(item['impact']);
 
-if (item['impact'] == '-' || item['orientation'] == '-'){
-  bgcolor = greencolour;
-}else{
-  bgcolor = redcolour;
-}
+
+  <div style="overflow-x:auto;">
+    <table id="indextable" class=table align="center">
+      <thead class="thead-light" align="center">
+        <th scope="col">Device ID</th>
+        <th>Date | Time</th>
+        <th><a href="javascript:SortTable(2,'N');">Data Point Number</th>
+          <th>Temperature</th>
+          <th>Humidity</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+          <th>Impact Measurement</th>
+          <th>Orientation Measurement</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+      </tbody>
+    </table>
+  </div>
+
+  <script type="text/javascript">
+  var obj = JSON.parse({{ datajson|tojson }});
+
+  $.each(obj, function (index, item) {
+
+    var eachrow;
+    var bgcolor ="";
+    var greencolour = "#32CD32";
+    var redcolour = "#ff0000";
+
+
+    console.log(item['impact']);
+    var latitude = item['latitude'];
+    var longitude = item['longitude'];
+
+    if (latitude == "0.00"){
+      latitude = "Unknown";
+    }
+
+    if (longitude == "0.00"){
+      longitude = "Unknown";
+    }
+
+    impact = (item['impact']);
+    orientation = (item['orientation']);
+
+    if (parseFloat(orientation).toString() === orientation || parseFloat(impact).toString() === impact) {
+      bgcolor = redcolour;
+    }else{
+      bgcolor = greencolour;
+    }
 
     eachrow = "<tr align='center' bgcolor= "+bgcolor+">"
-                 + "<td>" + item['deviceid'] + "</td>"
-                 + "<td>" + item['timestamp'] + "</td>"
-                 + "<td>" + item['datano'] + "</td>"
-                 + "<td>" + item['temperature'] + "</td>"
-                 + "<td>" + item['humidity'] + "</td>"
-                 + "<td>" + item['latitude'] + "</td>"
-                 + "<td>" + item['longitude'] + "</td>"
-                 + "<td>" + item['impact'] + "</td>"
-                 + "<td>" + item['orientation'] + "</td>"
-                 + "</tr>";
-     $('#tbody').append(eachrow);
-});
- </script>
+    + "<td>" + item['deviceid'] + "</td>"
+    + "<td>" + item['timestamp'] + "</td>"
+    + "<td>" + item['datano'] + "</td>"
+    + "<td>" + item['temperature'] + "</td>"
+    + "<td>" + item['humidity'] + "</td>"
+    + "<td>" + latitude + "</td>"
+    + "<td>" + longitude + "</td>"
+    + "<td>" + item['impact'] + "</td>"
+    + "<td>" + item['orientation'] + "</td>"
+    + "</tr>";
+    $('#tbody').append(eachrow);
+  });
+  </script>
 
 
 
 
 
-<br></br>
+  <br></br>
 </body>
 </html>
