@@ -349,12 +349,7 @@ void GPSLoop(){
   }
   else {
     failedUpdates++;
-    for (int thisNote = 0; thisNote < 3; thisNote++) {
-    // pin8 output the voice, every scale is 0.5 sencond
-    tone(8, gpsErrorMelody[thisNote], 100);
-    // Output the voice after several minutes
-    delay(400);
-     }
+     
     
   }
   stringplace = 0;
