@@ -1,19 +1,22 @@
+///Define the libraries needed for the application.
 #include <ArduinoJson.h>
 #include <pitches.h>
-
 #include <SoftwareSerial.h>
 #include <SimpleDHT.h>
 
-////LED START-----------------------------------------
+///Define the locations of each light bulb on Arduino UNO.
 #define BLUE 9
 #define GREEN 8
-///GPS START-----------------------------------------
+
+///Define the attributes required for the GPS module.
 #define NMEA_LATITUDE_INDEX (2)
 #define NMEA_LATITUDE_HEMISPHERE_INDEX (3)
 #define NMEA_LONGITUDE_INDEX (4)
 #define NMEA_LONGITUDE_HEMISPHERE_INDEX (5)
 #define NMEA_TIME_INDEX (0)
 #define NMEA_DATE_INDEX (8)
+
+///Define the locations of the GPS Module on Arduino.
 SoftwareSerial GPSModule(3, 2); // RX, TX
 int updates;
 int failedUpdates;
