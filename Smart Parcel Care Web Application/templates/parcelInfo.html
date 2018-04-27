@@ -44,8 +44,14 @@ function initialize()
 
 
   for(var i =0;i<devicedata.length;i++){
-    latitude = devicedata[i].latitude;
-    longitude = devicedata[i].longitude;
+    if(devicedata[i].latitude == 0.00 || devicedata[i].longitude == 0.00){
+      console.log("ZERO: " + devicedata[i].latitude + " : " + devicedata[i].longitude);
+    }else{
+        console.log("YES: " + devicedata[i].latitude + " : " + devicedata[i].longitude);
+        latitude = devicedata[i].latitude;
+        longitude = devicedata[i].longitude;
+    }
+
 
     console.log(latitude + " - " + longitude);
   }
@@ -65,6 +71,8 @@ function initialize()
   var warnings= 0;
 
   var warningHTML;
+
+  var markerLat,markerLon,markerLabel;
 
 
   for (i = 0; i < devicedata.length; i++) {
@@ -86,11 +94,20 @@ function initialize()
     }
     document.getElementById('output').innerHTML = warningHTML;
 
+    if(devicedata[i].latitude == 0.00 || devicedata[i].longitude == 0.00){
+      console.log("ZERO: " + devicedata[i].latitude + " : " + devicedata[i].longitude);
+    }else{
+        console.log("YES: " + devicedata[i].latitude + " : " + devicedata[i].longitude);
+        markerLat=devicedata[i].latitude;
+        markerLon=devicedata[i].longitude;
+        markerLabel=devicedata[i].datano;
+    }
+
     marker = new google.maps.Marker({
-      position: new google.maps.LatLng(devicedata[i].latitude, devicedata[i].longitude),
+      position: new google.maps.LatLng(markerLat, markerLon),
       icon: icon,
       map: map,
-      label: devicedata[i].datano
+      label: markerLabel
 
     });
 
@@ -256,8 +273,8 @@ function CompareRowOfNumbers(a,b) {
     + "<td>" + item['deviceid'] + "</td>"
     + "<td>" + item['timestamp'] + "</td>"
     + "<td>" + item['datano'] + "</td>"
-    + "<td>" + item['temperature'] + "</td>"
-    + "<td>" + item['humidity'] + "</td>"
+    + "<td>" + item['temperature'] + "°C</td>"
+    + "<td>" + item['humidity'] + "%</td>"
     + "<td>" + latitude + "</td>"
     + "<td>" + longitude + "</td>"
     + "<td>" + item['impact'] + "</td>"
