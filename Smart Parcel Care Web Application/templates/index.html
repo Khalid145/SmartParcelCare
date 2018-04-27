@@ -1,16 +1,23 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+<div class="text-center" >
+  <h8 align="text-center">Created By Khalid Mohamed</h8>
+</div>
+
 <div class="jumbotron text-center" >
+
   <h1>Welcome To Smart Parcel Care</h1>
   <p class="lead">Track everything that happens to your parcel in real-time with Smart Parcel Care.</p>
 
   {% from "includes/_formhelpers.html" import render_field %}
+
 <form method="POST" action="">
   <div class="form-group">
     {{render_field(form.deviceid, class_="form-control")}}
   </div>
   <p><input type="submit" class="btn btn-primary" value="Search"></p>
+
 </form>
 </div>
 {% endblock %}
