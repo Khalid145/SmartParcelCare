@@ -1,5 +1,4 @@
-CS7080 Cloud Computing and Internet of Things Assignment 2018
-- Khalid Mohamed (13036087)
+# Smart Parcel Care Web Application
 
 Smart Parcel Care is a way of keeping track of parcels based on a variety of measurements. 
 
