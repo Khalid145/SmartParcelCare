@@ -42,9 +42,11 @@ int greenledPin = 11;
 int redledPin = 12;
 int startbuttonpin = 10;
 int stopbuttonpin = 13;
+int changeidpin = 7;
 byte leds = 0;
 int run;
 
+int changeidMelody[] = {NOTE_B5, NOTE_B5};
 int startMelody[] = {NOTE_C5, NOTE_C6};
 int stopMelody[] = {NOTE_C5, NOTE_C5};
 int dht11ErrorMelody[] = {NOTE_D5, NOTE_D5};
@@ -61,7 +63,8 @@ void setup() {
   pinMode(greenledPin, OUTPUT);
   pinMode(redledPin, OUTPUT);
   pinMode(startbuttonpin, INPUT_PULLUP);
-  pinMode(stopbuttonpin, INPUT_PULLUP);   
+  pinMode(stopbuttonpin, INPUT_PULLUP); 
+  pinMode(changeidpin, INPUT_PULLUP);   
   digitalWrite(redledPin, HIGH);
   pinMode(BLUE, OUTPUT);
   digitalWrite(BLUE, LOW);
@@ -89,7 +92,7 @@ float stringToFloat(String s){
  String impact = "-";
  String orientation = "-";
 
- String deviceid = "device3";
+ int deviceid = 1;
  int datano = 1;
  String buttonstate = "on";
 
@@ -110,6 +113,26 @@ void loop()
   xfinal = x, DEC;
   yfinal = y, DEC;
   zfinal = z, DEC;
+
+  if(digitalRead(changeidpin) == LOW) {
+    if(run > 0){ 
+      
+    
+  }else{
+    deviceid++;
+      datano = 1;
+    for (int thisNote = 0; thisNote < 2; thisNote++) {
+    // pin8 output the voice, every scale is 0.5 sencond
+    tone(8, changeidMelody[thisNote], 300);
+    // Output the voice after several minutes
+    delay(startMelodyDelay);
+  }
+  }
+
+         
+         
+  
+  }
   
   if(digitalRead(startbuttonpin) == LOW) {
          run = 255;
@@ -232,6 +255,7 @@ void createJson(){
   Serial.print('"');
   Serial.print(':');
   Serial.print('"');
+  Serial.print("device");
   Serial.print(deviceid);
   Serial.print('"');
   Serial.print(',');
