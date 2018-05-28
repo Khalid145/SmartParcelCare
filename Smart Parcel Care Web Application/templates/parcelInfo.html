@@ -4,8 +4,6 @@
   <title>Smart Parcel Care</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"></link>
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.css">
-
-
 </head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <style type="text/css">
@@ -15,18 +13,17 @@ body { height: 100%; margin: 0; padding: 0 }
 </style>
 <script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyDacaKvgAx-uptiuDDCTf0RMEeucHFS9KA"></script>
 <script type="text/javascript">
+//This will get the JSON from the response and use it to display it on Google Map
 function initialize()
 {
   var devicedata="";
-  console.log(devicedata);
-  devicedata = JSON.parse({{ datajson|tojson }});
-  console.log(devicedata);
-
   var latitude;
   var longitude;
 
+  //Obtain the JSON from the request and place it in a placeholder
+  devicedata = JSON.parse({{ datajson|tojson }});
 
-
+  //Specify the look for the green marker on Google Map
   var greenIcon = {
     url: "https://maps.gstatic.com/mapfiles/ms2/micons/green.png", // url
     scaledSize: new google.maps.Size(50, 50), // scaled size
@@ -34,6 +31,7 @@ function initialize()
     anchor: new google.maps.Point(0, 0) // anchor
   };
 
+  //Specify the look for the red marker on Google Map
   var redIcon = {
     url: "https://maps.gstatic.com/mapfiles/ms2/micons/red.png", // url
     scaledSize: new google.maps.Size(50, 50), // scaled size
@@ -41,27 +39,25 @@ function initialize()
     anchor: new google.maps.Point(0, 0) // anchor
   };
 
-
-
+  //Checker for last valid GPS location
   for(var i =0;i<devicedata.length;i++){
+    //Check if the latitude and longitude is 0
     if(devicedata[i].latitude == 0.00 || devicedata[i].longitude == 0.00){
-      console.log("ZERO: " + devicedata[i].latitude + " : " + devicedata[i].longitude);
+      //Do Nothing
     }else{
-        console.log("YES: " + devicedata[i].latitude + " : " + devicedata[i].longitude);
-        latitude = devicedata[i].latitude;
-        longitude = devicedata[i].longitude;
+      //Assign valid coordinates to a placeholder
+      latitude = devicedata[i].latitude;
+      longitude = devicedata[i].longitude;
     }
-
-
-    console.log(latitude + " - " + longitude);
   }
 
+  //Specify Google Map auto zoom coordinates
   var myOptions = {center: new google.maps.LatLng(latitude, longitude),
     zoom: 15,
     mapTypeId: google.maps.MapTypeId.ROADMAP
   };
 
-
+  //Map GoogleMap function to HTML placeholder
   var map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
   var infowindow = new google.maps.InfoWindow();
 
@@ -69,14 +65,12 @@ function initialize()
   var i = "";
   var icon = "";
   var warnings= 0;
-
   var warningHTML;
-
   var markerLat,markerLon,markerLabel;
 
-
+  //Iterate through the data array
   for (i = 0; i < devicedata.length; i++) {
-
+    //Check if orientation and impact contains a value
     if(parseFloat(devicedata[i].orientation).toString() === devicedata[i].orientation || parseFloat(devicedata[i].impact).toString() === devicedata[i].impact) {
       icon = redIcon;
       warnings++
@@ -86,7 +80,7 @@ function initialize()
     var noWarningsText = "<font color='green'>" + warnings + " warnings.</font>";
     var warningsText = "<font color='red'>" + warnings + " warnings. Warnings are shown as RED </font>";
 
-
+    // Check number of warnings and choose the appropiate HTML code
     if (warnings <= 0){
       warningHTML = noWarningsText;
     }else{
@@ -94,15 +88,17 @@ function initialize()
     }
     document.getElementById('output').innerHTML = warningHTML;
 
+    //Check if latitude and longitude is 0.
     if(devicedata[i].latitude == 0.00 || devicedata[i].longitude == 0.00){
-      console.log("ZERO: " + devicedata[i].latitude + " : " + devicedata[i].longitude);
+      //Do nothing
     }else{
-        console.log("YES: " + devicedata[i].latitude + " : " + devicedata[i].longitude);
-        markerLat=devicedata[i].latitude;
-        markerLon=devicedata[i].longitude;
-        markerLabel=devicedata[i].datano;
+      //Add values to placeholders
+      markerLat=devicedata[i].latitude;
+      markerLon=devicedata[i].longitude;
+      markerLabel=devicedata[i].datano;
     }
 
+    //Retrieve coordinates and place a marker on Google Map
     marker = new google.maps.Marker({
       position: new google.maps.LatLng(markerLat, markerLon),
       icon: icon,
@@ -111,8 +107,10 @@ function initialize()
 
     });
 
+    //This is triggered when a marker is clicked
     google.maps.event.addListener(marker, 'click', (function(marker, i) {
       return function() {
+        //Create a pop-up window with further information about a specific marker
         var content;
 
         var failedContent = '<p>Time: ' + devicedata[i].timestamp + '</p>' +
@@ -126,12 +124,12 @@ function initialize()
         '<p>Temperature: ' +  devicedata[i].temperature + '°C' + '</p>' +
         '<p>Humidity: ' + devicedata[i].humidity + '</p>';
 
+        //Check if array contains value for impact or orientation and choose appropiate HTML code
         if( "impact" in devicedata[i] ||  "orientation" in devicedata[i] ) {
           content = failedContent;
         }else{
           content = goodContent;
         }
-
         infowindow.setContent(content);
         infowindow.open(map, marker);
       }
@@ -143,9 +141,8 @@ function initialize()
 
 
 <script type="text/javascript">
-
+//This script handles the numeric sortation in a table
 var TableIDvalue = "indextable";
-
 var TableLastSortedColumn = -1;
 function SortTable() {
   var sortColumn = parseInt(arguments[0]);
@@ -189,19 +186,6 @@ function CompareRowOfNumbers(a,b) {
 }
 </script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 <body onload="initialize()">
   {% include 'includes/_navbar.html' %}
   <div class="jumbotron text-center" style="padding: 20px;">
@@ -214,10 +198,6 @@ function CompareRowOfNumbers(a,b) {
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <div id="dvCSV" align="center" >
   </div>
-
-
-
-
   <div style="overflow-x:auto;">
     <table id="indextable" class=table align="center">
       <thead class="thead-light" align="center">
@@ -238,6 +218,7 @@ function CompareRowOfNumbers(a,b) {
   </div>
 
   <script type="text/javascript">
+  //This script will get the JSON for the request and place the data in a table format
   var obj = JSON.parse({{ datajson|tojson }});
 
   $.each(obj, function (index, item) {
@@ -247,8 +228,6 @@ function CompareRowOfNumbers(a,b) {
     var greencolour = "#32CD32";
     var redcolour = "#ff0000";
 
-
-    console.log(item['impact']);
     var latitude = item['latitude'];
     var longitude = item['longitude'];
 
@@ -268,7 +247,6 @@ function CompareRowOfNumbers(a,b) {
     }else{
       bgcolor = greencolour;
     }
-
     eachrow = "<tr align='center' bgcolor= "+bgcolor+">"
     + "<td>" + item['deviceid'] + "</td>"
     + "<td>" + item['timestamp'] + "</td>"
@@ -283,11 +261,6 @@ function CompareRowOfNumbers(a,b) {
     $('#tbody').append(eachrow);
   });
   </script>
-
-
-
-
-
   <br></br>
 </body>
 </html>
