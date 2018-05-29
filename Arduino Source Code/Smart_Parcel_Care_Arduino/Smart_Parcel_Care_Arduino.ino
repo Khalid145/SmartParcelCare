@@ -324,7 +324,7 @@ void createJson(){
   Serial.print('"');
   Serial.print(':');
   Serial.print('"');
-  Serial.print(latitude, 5);
+  Serial.print(latitude, 7);
   Serial.print('"');
   Serial.print(',');
   Serial.print('"');
@@ -332,7 +332,7 @@ void createJson(){
   Serial.print('"');
   Serial.print(':');
   Serial.print('"');
-  Serial.print(longitude, 5);
+  Serial.print(longitude, 7);
   Serial.print('"');
   Serial.print(',');
   Serial.print('"');
