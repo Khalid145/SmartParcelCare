@@ -16,8 +16,9 @@
 #define NMEA_TIME_INDEX (0)
 #define NMEA_DATE_INDEX (8)
 
+
 ///Define the locations of the GPS Module on Arduino.
-SoftwareSerial GPSModule(3, 2); // RX, TX
+SoftwareSerial GPSModule(2, 3); // RX, TX
 int updates;
 int failedUpdates;
 int pos;
@@ -110,6 +111,7 @@ static unsigned long lastRefreshTime = 0; //ms
 //This method will run continuously until the device is powered off.
 void loop()
 {
+  GPSLoop();
   //Specify varibale placeholder for the ADXL335.
   x = analogRead(a1);     
   y = analogRead(a2);     
@@ -322,7 +324,7 @@ void createJson(){
   Serial.print('"');
   Serial.print(':');
   Serial.print('"');
-  Serial.print(latitude);
+  Serial.print(latitude, 5);
   Serial.print('"');
   Serial.print(',');
   Serial.print('"');
@@ -330,7 +332,7 @@ void createJson(){
   Serial.print('"');
   Serial.print(':');
   Serial.print('"');
-  Serial.print(longitude);
+  Serial.print(longitude, 5);
   Serial.print('"');
   Serial.print(',');
   Serial.print('"');
